@@ -1,4 +1,4 @@
-function main
+function MLMC_MC_euler
 
 clear all; close all; clc
 
