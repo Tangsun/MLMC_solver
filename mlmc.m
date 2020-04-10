@@ -1,4 +1,5 @@
 function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, N_exp)
+    %% Preprocessing
     %Read information at each level from test_result
     L = L_init; Nl = zeros(L+1, 1);
     L_update = 1;
@@ -26,6 +27,7 @@ function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, 
         end
     end
     
+    %% MLMC estimation
     %Run MLMC experiments with L, Nl, Vl found earlier
     Y = zeros(N_exp, 1);
     tic;
@@ -36,9 +38,9 @@ function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, 
         end
     end
     mlmc_sol.cost_act = toc;
-    mlmc_sol.cost_pred = 4*Nl(1);
+    mlmc_sol.cost_pred = 2*M*Nl(1);
     for i = 1: L
-        mlmc_sol.cost_pred = mlmc_sol.cost_pred + Nl(i+1)*4*(1 + M);
+        mlmc_sol.cost_pred = mlmc_sol.cost_pred + Nl(i+1)*(2*M^i)*(1 + M);
     end
     mlmc_sol.L = L;
     mlmc_sol.Nl = Nl;
@@ -47,15 +49,17 @@ function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, 
     mlmc_sol.mse = sum((Y - Q_true).^2)/N_exp;
     mlmc_sol.var = var(Y);
     
+    %% Equivalent standard MC estimation
     %Run standard MC with equivalent computational cost
     mc_sol.Nspl = mlmc_sol.cost_pred/(2*M^(L+1));
     Y_mc = zeros(N_exp, 1);
     tic;
     for i = 1: N_exp
-        [~, P_mc] = feval(objFcn, 0, mc_sol.Nspl);
-        Y_mc(i) = P_mc(1);
+        [Q_mc, ~] = feval(objFcn, L, mc_sol.Nspl);
+        Y_mc(i) = Q_mc(1);
     end
     mc_sol.cost_act = toc;
+    mc_sol.cost_pred = mc_sol.Nspl*(2*M^(L+1));
     mc_sol.mu = mean(Y_mc);
     mc_sol.mse = sum((Y_mc - Q_true).^2)/N_exp;
     mc_sol.var = var(Y_mc);

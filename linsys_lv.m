@@ -11,7 +11,7 @@ function [Q_info, P_info] = linsys_lv(l, N)
     xf = x0*ones(nf + 1, 1);
     
     if l > 0
-        nc = nf/2;
+        nc = nf/M;
         hc = T/nc;
         xc = x0*ones(nc + 1, 1);
     end

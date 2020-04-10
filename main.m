@@ -8,11 +8,11 @@ N_pilot = 1e5;    %pilot sample size
 L_pilot = 8;     %initial levels with sample size
 
 % Eps = [0.005, 0.01, 0.02, 0.05, 0.1];  %desired accuracies
-Eps = [0.05 0.02];
+Eps = [0.05 0.02 0.01];
 
 %% Generate true value (estimation with large sample size)
 x0 = 10; T = 1;
-Q_true = x0*exp(-2*T + 0.25*T^2);
+Q_true = x0*exp(-2*T + 0.5*T^2);
 
 %% MLMC test results
 test_result = mlmc_test(@linsys_lv, M, N_pilot, L_pilot);
@@ -49,9 +49,9 @@ mc_mse = zeros(length(Eps), 1); mc_cost = zeros(length(Eps), 1);
 for i = 1: length(Eps)
     [mlmc_sol, mc_sol] = mlmc(@linsys_lv, M, test_result, 3, Eps(i), Q_true, 500);
     subplot(2, 1, 1); hold on
-    loglog([0: mlmc_sol.L], mlmc_sol.Nl);
-    mlmc_mse(i) = mlmc_sol.mse; mlmc_cost(i) = mlmc_sol.cost_act;
-    mc_mse(i) = mc_sol.mse; mc_cost(i) = mc_sol.cost_act;
+    semilogy([0: mlmc_sol.L], mlmc_sol.Nl);
+    mlmc_mse(i) = mlmc_sol.mse; mlmc_cost(i) = mlmc_sol.cost_pred;
+    mc_mse(i) = mc_sol.mse; mc_cost(i) = mc_sol.cost_pred;
 end
 
 set(2,'DefaultAxesLineStyleOrder','-*|--*')
@@ -59,4 +59,5 @@ subplot(2, 1, 2); hold on
 loglog(mlmc_mse, mlmc_cost);
 loglog(mc_mse, mc_cost);
 legend('MLMC', 'MC');
+pause;
 end
