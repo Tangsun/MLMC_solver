@@ -51,7 +51,7 @@ function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, 
     
     %% Equivalent standard MC estimation
     %Run standard MC with equivalent computational cost
-    mc_sol.Nspl = mlmc_sol.cost_pred/(2*M^(L+1));
+    mc_sol.Nspl = ceil(mlmc_sol.cost_pred/(2*M^(L+1)));
     Y_mc = zeros(N_exp, 1);
     tic;
     for i = 1: N_exp
