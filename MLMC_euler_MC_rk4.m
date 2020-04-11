@@ -1,4 +1,4 @@
-function MLMC_MC_euler
+function MLMC_euler_MC_rk4
 
 clear all; close all; clc
 
@@ -15,7 +15,9 @@ x0 = 10; T = 1;
 Q_true = x0*exp(-2*T + 0.5*T^2);
 
 %% MLMC test results
-test_result = mlmc_test(@linsys_lv_euler, M, N_pilot, L_pilot);
+tic;
+test_result = mlmc_test(@linsys_lv_rk4, M, N_pilot, L_pilot);
+preproc_time = toc;
 
 figure(1); hold on
 subplot(2, 2, 1); hold on
@@ -51,7 +53,7 @@ mc_mse = zeros(length(Eps), 1); mc_cost = zeros(length(Eps), 1);
 mc_var = zeros(length(Eps), 1); mc_err = zeros(length(Eps), 1);
 mc_time = zeros(length(Eps), 1);
 for i = 1: length(Eps)
-    [mlmc_sol, mc_sol] = mlmc(@linsys_lv_euler, M, test_result, 3, Eps(i), Q_true, 500);
+    [mlmc_sol, mc_sol] = mlmce_mcrk4(@linsys_lv_euler, M, test_result, 3, Eps(i), Q_true, 500);
     subplot(2, 2, 1); hold on
     semilogy([0: mlmc_sol.L], mlmc_sol.Nl);
     mlmc_mse(i) = mlmc_sol.mse; mlmc_cost(i) = mlmc_sol.cost_pred;

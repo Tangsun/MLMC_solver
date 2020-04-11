@@ -1,4 +1,4 @@
-function MLMC_MC_euler
+function MLMC_rk4_MC_rkf
 
 clear all; close all; clc
 
@@ -8,14 +8,16 @@ N_pilot = 1e5;    %pilot sample size
 L_pilot = 8;     %initial levels with sample size
 
 % Eps = [0.005, 0.01, 0.02, 0.05, 0.1];  %desired accuracies
-Eps = [0.1 0.05 0.02 0.01];
+Eps = [0.05 0.02 0.01];
 
 %% Generate true value (estimation with large sample size)
 x0 = 10; T = 1;
 Q_true = x0*exp(-2*T + 0.5*T^2);
 
 %% MLMC test results
-test_result = mlmc_test(@linsys_lv_euler, M, N_pilot, L_pilot);
+tic;
+test_result = mlmc_test(@linsys_lv_rk4, M, N_pilot, L_pilot);
+preproc_time = toc;
 
 figure(1); hold on
 subplot(2, 2, 1); hold on
@@ -50,8 +52,9 @@ mlmc_time = zeros(length(Eps), 1);
 mc_mse = zeros(length(Eps), 1); mc_cost = zeros(length(Eps), 1);
 mc_var = zeros(length(Eps), 1); mc_err = zeros(length(Eps), 1);
 mc_time = zeros(length(Eps), 1);
+reltol = 1e-3;
 for i = 1: length(Eps)
-    [mlmc_sol, mc_sol] = mlmc(@linsys_lv_euler, M, test_result, 3, Eps(i), Q_true, 500);
+    [mlmc_sol, mc_sol] = mlmcrk4_mcrkf(@linsys_lv_rk4, M, test_result, 3, Eps(i), Q_true, 100, reltol);
     subplot(2, 2, 1); hold on
     semilogy([0: mlmc_sol.L], mlmc_sol.Nl);
     mlmc_mse(i) = mlmc_sol.mse; mlmc_cost(i) = mlmc_sol.cost_pred;

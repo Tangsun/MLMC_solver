@@ -42,7 +42,7 @@ function test_result = mlmc_test(objFcn, M, N, L_pilot)
     fprintf('gamma = %f, c_3 = %f, for cost\n', gamma, c3);
     
     if max(checklv) > 1
-        fprintf('\nWARNING: maximum consistency error = %f \n', max(check1v));
+        fprintf('\nWARNING: maximum consistency error = %f \n', max(checklv));
         fprintf('indicates identity E[Pf-Pc] = E[Pf] - E[Pc] not satisfied \n\n');
     end
     
