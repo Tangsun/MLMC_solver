@@ -33,8 +33,8 @@ function [mlmc_sol, mc_sol] = mlmce_mcrk4(objFcn, M, test_result, L_init, eps, Q
     tic;
     for i = 1: N_exp
         for l = 0: L
-            [~, P_info] = feval(objFcn, l, Nl(l+1));
-            Y(i) = Y(i) + P_info(1);
+            [~, Pl] = feval(objFcn, l, Nl(l+1));
+            Y(i) = Y(i) + Pl(1);
         end
     end
     mlmc_sol.cost_act = toc;
@@ -51,15 +51,15 @@ function [mlmc_sol, mc_sol] = mlmce_mcrk4(objFcn, M, test_result, L_init, eps, Q
     
     %% Equivalent standard MC estimation with rk4 at most coarse level
     %Run standard MC with equivalent computational cost
-    mc_sol.Nspl = ceil(mlmc_sol.cost_pred/(2*M^1)/5);
+    mc_eql = 1;
+    mc_sol.Nspl = ceil(mlmc_sol.cost_pred/(2*M^(mc_eql + 1))/5);
     Y_mc = zeros(N_exp, 1);
     tic;
     for i = 1: N_exp
-        [Q_mc, ~] = linsys_lv_rk4(0, mc_sol.Nspl);
-        Y_mc(i) = Q_mc(1);
+        Y_mc(i) = linsys_mc_rk4(mc_eql, mc_sol.Nspl);
     end
     mc_sol.cost_act = toc;
-    mc_sol.cost_pred = mc_sol.Nspl*(2*(M^1))*5;
+    mc_sol.cost_pred = mc_sol.Nspl*(2*(M^(mc_eql + 1)))*5;
     mc_sol.mu = mean(Y_mc);
     mc_sol.mse = sum((Y_mc - Q_true).^2)/N_exp;
     mc_sol.var = var(Y_mc);

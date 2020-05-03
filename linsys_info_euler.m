@@ -1,4 +1,4 @@
-function [Q_info, P_info] = linsys_lv_euler(l, N)
+function [Q_info, P_info] = linsys_info_euler(l, N)
     %Q_info, contains the mean of all objFcn samples, objFcn^2
     %P_info, contains the mean of all P_l, P_l^2, P_l^3, P_l^4
     Q_info = zeros(2, 1); P_info = zeros(4, 1);
