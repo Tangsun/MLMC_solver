@@ -1,4 +1,5 @@
 function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, N_exp)
+    global Eps
     %% Preprocessing
     %Read information at each level from test_result
     L = L_init; Nl = zeros(L+1, 1);
@@ -51,9 +52,8 @@ function [mlmc_sol, mc_sol] = mlmc(objFcn, M, test_result, L_init, eps, Q_true, 
     
     %% Equivalent standard MC estimation
     %Run standard MC with equivalent computational cost
-    eps_val = [0.03, 0.025, 0.02, 0.015, 0.01, 0.005];
-    eps_i = find(eps_val == eps);
-    mc_eql = L + 4;
+    eps_i = find(Eps == eps);
+    mc_eql = L;
     mc_sol.Nspl = ceil(mlmc_sol.cost_pred/(2*M^(mc_eql+1)));
     Y_mc = zeros(N_exp, 1);
     tic;
